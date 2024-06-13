@@ -12,6 +12,7 @@ const port = 8080;
 const path = require("path");
 // For using post-patch-delete methods in form
 const methodOverride = require("method-override");
+const { connect } = require("http2");
 
 app.use(methodOverride("_method"));
 // To parse the post request values
@@ -93,6 +94,11 @@ app.get("/user/:id/edit", (req, res) => {
   }
 });
 
+// ADD Route
+app.get("/user/add", (req, res) => {
+      res.render("add.ejs");
+});
+
 // DELETE Confirm Route
 app.get("/user/:id/delete", (req, res) => {
   let { id } = req.params;
@@ -106,6 +112,29 @@ app.get("/user/:id/delete", (req, res) => {
     });
   } catch (err) {
     console.log("something went wrong");
+  }
+});
+
+// ADD Route
+app.post("/user", (req, res) => {
+  let {username: newusername, password: newpassword, email: newemail} = req.body;
+  let id = faker.datatype.uuid();
+  //res.send(req.body);
+  //console.log(newusername, newpassword, newemail, id);
+
+  let query = `INSERT INTO company (id, username, email, password) VALUES ('${id}', '${newusername}', '${newemail}', '${newpassword}')`;
+
+  try {
+    connection.query(query, (err, result) => {
+      if (err) throw err;
+      res.redirect("/user");
+    });
+  }catch (err) {
+    if ('ER_DUP_ENTRY') {
+      res.send("This record is already present in the list!!");
+    }
+    console.log(err);
+    res.send("Something went wrong!!");
   }
 });
 
