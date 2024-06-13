@@ -93,6 +93,22 @@ app.get("/user/:id/edit", (req, res) => {
   }
 });
 
+// DELETE Confirm Route
+app.get("/user/:id/delete", (req, res) => {
+  let { id } = req.params;
+  let q = `SELECT * FROM company WHERE id='${id}'`;
+
+  try {
+    connection.query(q, (err, result) => {
+      if (err) throw err;
+      let user = result[0];
+      res.render("delete.ejs", { user });
+    });
+  } catch (err) {
+    console.log("something went wrong");
+  }
+});
+
 // UPDATE Route
 app.patch("/user/:id", (req, res) => {
   // fetch the id from paramaters
@@ -126,6 +142,34 @@ app.patch("/user/:id", (req, res) => {
   } catch (err) {
     console.log(err);
   }
+});
+
+// DELETE Route
+app.delete("/user/:id", (req, res) => {
+  let { id } = req.params;
+  let listq = `SELECT * FROM company WHERE id='${id}'`;
+  let { password: confirmPassword } = req.body;
+
+  try {
+    connection.query (listq, (err, result) => {
+      if(err) throw err;
+      let user = result[0];
+
+      if(confirmPassword != user.password) {
+        res.send("Wrong Password!!")
+        //console.log(confirmPassword, user.password);
+      }
+      else {
+        let deleteQuery = `DELETE FROM company WHERE id='${id}'`;
+        connection.query(deleteQuery, (err, result) => {
+          if (err) throw err;
+          res.redirect("/user");
+        });
+      }
+    });
+  }catch (err) {
+    console.log(err);
+  } 
 });
 
 // for incoming requests
