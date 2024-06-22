@@ -117,7 +117,7 @@ const newCollection = mongoose.model("newCollection", userSchema);
  **__v: 0
 **}
 */
-newCollection.findOneAndDelete({ name: "ISO" }, { age: 100 }).then((res) => {
+newCollection.findOneAndDelete({ name: "ISO" }, { age: 100 }, {new: true}).then((res) => {
   console.log(res);
 });
 
